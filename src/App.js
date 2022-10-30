@@ -1,21 +1,20 @@
-import { useState, useEffect, useCallback } from "react";
-import { createTheme } from "@mui/material/styles";
+import { React, useState, useEffect, useCallback, useMemo } from "react";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
 import {
   Container,
   Button,
   Box,
   Typography,
-  Card,
-  Stack,
   List,
   ListItem,
   ListItemText,
 } from "@mui/material";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
+
 //Data
 import colors from "./colors";
+import ColorList from "./components/ColorPalette/ColorList";
 
 function App() {
   const [allColors, setAllColors] = useState(colors);
@@ -26,16 +25,20 @@ function App() {
   const [themeMode, setMode] = useState("light");
   const [background, setBackground] = useState("");
 
-  const theme = createTheme({
-    palette: {
-      mode: themeMode,
-      primary: {
-        light: "#e0e0e0",
-        main: primary,
-        dark: "#878686",
-      },
-    },
-  });
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: themeMode,
+          primary: {
+            light: "#e0e0e0",
+            main: primary,
+            dark: "#878686",
+          },
+        },
+      }),
+    [themeMode, primary]
+  );
 
   const setColors = useCallback(
     (colors) => setAllColors(colors),
@@ -56,12 +59,10 @@ function App() {
   };
 
   const setThemeMode = (color) => {
-    console.log("ALL", allPrimary);
-    if (!allPrimary.includes(color)) {
+    if (!allPrimary.includes(color) && allPrimary.length > 4) {
+      setAllPrimary([...allPrimary, color].slice(-5));
+    } else if (!allPrimary.includes(color)) {
       setAllPrimary([...allPrimary, color]);
-    }
-    if (allPrimary.length > 5) {
-      setAllPrimary(allPrimary.slice(-5));
     }
     setPrimary(color.hex);
     if (color.shade >= 500) {
@@ -72,118 +73,69 @@ function App() {
       setBackground(theme.palette.primary.light);
     }
   };
-  const displayColors = (array) =>
-    array.map((c, index) => (
-      <Card key={index}>
-        <Box
-          style={{
-            backgroundColor: c.hex,
-            width: 150,
-            height: 100,
-          }}
-        />
-
-        <Typography sx={{ color: c.hex }}>
-          {c.hex}
-          {favorites.includes(c) ? (
-            <IconButton
-              aria-label="delete from favorites"
-              style={{ color: "red" }}
-              onClick={() => deleteFavorite(c)}
-            >
-              <FavoriteBorderIcon />
-            </IconButton>
-          ) : (
-            <IconButton
-              aria-label="add to favorites"
-              onClick={() => addToFavorite(c)}
-            >
-              <FavoriteBorderIcon />
-            </IconButton>
-          )}
-        </Typography>
-        <Button
-          variant="text"
-          size="small"
-          onClick={() => setThemeMode(c)}
-          sx={{
-            backgroundColor: theme.palette.primary.main,
-          }}
-        >
-          Set As Primary Color
-        </Button>
-      </Card>
-    ));
-
-  const addToFavorite = (color) => {
-    if (!favorites.includes(color) && favorites.length <= 8) {
-      setFavorites([...favorites, color]);
-    } else {
-      setFavorites(favorites.slice(8));
-    }
-  };
-  const deleteFavorite = (color) => {
-    const data = favorites.filter((item) => item.hex !== color.hex);
-    setFavorites(data);
-  };
 
   const deletePrimary = (color) => {
-    const data = allPrimary.filter((item) => item.hex !== color.hex);
-    setAllPrimary(data);
+    const primaries = allPrimary.filter((prime) => prime.hex !== color.hex);
+    setAllPrimary(primaries);
   };
 
   useEffect(() => {
     setColors(colors);
-  }, [setColors, allColors, favorites, shuffled]);
+  }, [setColors, allColors, theme]);
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <Container
         maxWidth="false"
         disableGutters
         sx={{ backgroundColor: background, height: "100vh" }}
       >
         <Button
-          variant="outlined"
+          variant="contained"
           onClick={getRandomColors}
           sx={{ backgroundColor: theme.palette.primary.main, margin: "10px" }}
         >
           Generate Color Palette
         </Button>
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={{ xs: 1, sm: 2, md: 4 }}
-        >
-          {displayColors(shuffled)}
-          {displayColors(favorites)}
-        </Stack>
+
+        <ColorList
+          setThemeMode={setThemeMode}
+          allColor={allColors}
+          favorites={favorites}
+          setFavorites={setFavorites}
+          shuffled={shuffled}
+          setShuffled={setShuffled}
+          theme={theme}
+        />
+
         <Box
           sx={{ flexGrow: 1, width: "100%", maxWidth: 360, bgcolor: "white" }}
         >
           <Typography sx={{ mt: 4, mb: 2 }} variant="h6" component="div">
-            Primary Colors:{" "}
+            Primary Colors:
           </Typography>
           <List>
-            {allPrimary.map((prim, index) => (
+            {allPrimary.map((prime, index) => (
               <ListItem
                 key={index}
                 secondaryAction={
                   <IconButton
                     edge="start"
                     aria-label="delete"
-                    onClick={() => deletePrimary(prim)}
+                    sx={{ color: "black" }}
+                    onClick={() => deletePrimary(prime)}
                   >
                     <DeleteIcon />
                   </IconButton>
                 }
               >
-                <ListItemText primary={prim.hex} sx={{ color: prim.hex }} />
+                <ListItemText primary={prime.hex} sx={{ color: prime.hex }} />
               </ListItem>
             ))}
           </List>
         </Box>
       </Container>
-    </>
+    </ThemeProvider>
   );
 }
 
