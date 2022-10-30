@@ -58,7 +58,7 @@ function App() {
     }
   };
 
-  const setThemeMode = (color) => {
+  const setTheme = (color) => {
     if (!allPrimary.includes(color) && allPrimary.length > 4) {
       setAllPrimary([...allPrimary, color].slice(-5));
     } else if (!allPrimary.includes(color)) {
@@ -99,7 +99,7 @@ function App() {
         </Button>
 
         <ColorList
-          setThemeMode={setThemeMode}
+          setTheme={setTheme}
           allColor={allColors}
           favorites={favorites}
           setFavorites={setFavorites}
@@ -133,7 +133,7 @@ function App() {
                 <Button
                   variant="contained"
                   size="small"
-                  onClick={() => setThemeMode(prime)}
+                  onClick={() => setTheme(prime)}
                   sx={{
                     backgroundColor: "grey",
                   }}

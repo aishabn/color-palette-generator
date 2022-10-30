@@ -4,7 +4,7 @@ import IconButton from "@mui/material/IconButton";
 
 const ColorList = ({
   theme,
-  setThemeMode,
+  setTheme,
   favorites,
   setFavorites,
   shuffled,
@@ -56,7 +56,7 @@ const ColorList = ({
         <Button
           variant="outline"
           size="small"
-          onClick={() => setThemeMode(c)}
+          onClick={() => setTheme(c)}
           sx={{
             backgroundColor: theme.palette.primary.main,
           }}
@@ -74,7 +74,7 @@ const ColorList = ({
       >
         {displayColors(shuffled)}
         {displayColors(favorites)}
-      </Stack>{" "}
+      </Stack>
     </>
   );
 };
