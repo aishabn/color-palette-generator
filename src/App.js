@@ -11,10 +11,10 @@ import {
 } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ColorList from "./components/ColorPalette/ColorList";
 
 //Data
 import colors from "./colors";
-import ColorList from "./components/ColorPalette/ColorList";
 
 function App() {
   const [allColors, setAllColors] = useState(colors);
@@ -122,7 +122,7 @@ function App() {
                   <IconButton
                     edge="start"
                     aria-label="delete"
-                    sx={{ color: "black" }}
+                    sx={{ color: "grey" }}
                     onClick={() => deletePrimary(prime)}
                   >
                     <DeleteIcon />
@@ -130,6 +130,16 @@ function App() {
                 }
               >
                 <ListItemText primary={prime.hex} sx={{ color: prime.hex }} />
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => setThemeMode(prime)}
+                  sx={{
+                    backgroundColor: "grey",
+                  }}
+                >
+                  Set
+                </Button>
               </ListItem>
             ))}
           </List>
